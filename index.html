@@ -18,6 +18,7 @@
 .flow-card{grid-column:1/-1;text-align:center}.flow-card p{color:var(--muted);margin:6px 0 18px}.flow-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}.flow-actions button{min-height:54px}.btn-secondary{background:linear-gradient(180deg,#475569,#334155)}.update-banner,.install-banner{position:fixed;z-index:20;left:50%;bottom:18px;transform:translate(-50%,calc(100% + 40px));width:min(94vw,560px);display:flex;align-items:center;gap:12px;padding:14px;border-radius:16px;background:#fff;border:1px solid #cbd5e1;box-shadow:0 18px 45px rgba(0,0,0,.35);color:#0f172a;opacity:0;pointer-events:none;transition:.25s ease}.update-banner.show,.install-banner.show{transform:translate(-50%,0);opacity:1;pointer-events:auto}.update-banner div,.install-banner div{flex:1;text-align:left}.update-banner strong,.update-banner span,.install-banner strong,.install-banner span{display:block;color:#0f172a}.update-banner span,.install-banner span{margin-top:3px;color:#334155}.update-banner button,.install-banner button{width:auto;min-width:110px;background:#075db1;color:#fff;border:2px solid #075db1}.update-banner .banner-close,.install-banner .banner-close{min-width:44px;width:44px;padding:10px;background:#e2e8f0;color:#0f172a;border-color:#94a3b8}.qr-panel{margin-bottom:15px;padding:12px;border-radius:14px;background:#07111d;color:#fff}.qr-video{display:block;width:100%;max-height:360px;border-radius:10px;background:#000;object-fit:cover}.qr-status{margin:10px 0 0;line-height:1.4}.qr-summary{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px}.qr-summary div{padding:10px;border:1px solid var(--line);border-radius:10px;background:#f8fafc}.qr-summary strong,.qr-summary span{display:block}.qr-summary strong{font-size:12px;color:var(--muted);margin-bottom:4px}.palete-andamento{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:14px;padding:11px;border-radius:11px;background:#e0f2fe;color:#075db1;font-weight:800}.qr-mode .manual-field{display:none}.qr-scanning .qr-operational-field,.qr-scanning #acoesComposicao{display:none}.camera-actions{display:flex;gap:8px;margin-top:10px}.camera-actions button{font-size:14px}.hidden{display:none!important}@media(max-width:620px){.flow-actions,.qr-summary{grid-template-columns:1fr}.flow-actions button{min-height:58px}.camera-actions{flex-direction:column}.update-banner,.install-banner{align-items:stretch;flex-wrap:wrap;bottom:8px}.update-banner div,.install-banner div{flex-basis:100%}.update-banner button,.install-banner button{flex:1}}
 
 #btnExcelInicial{background:linear-gradient(180deg,var(--success),var(--success2));box-shadow:0 10px 20px rgba(34,164,71,.24),inset 0 1px 0 rgba(255,255,255,.20)}
+.recovery-overlay{position:fixed;z-index:30;inset:0;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(3,10,18,.72)}.recovery-overlay.show{display:flex}.recovery-dialog{width:min(94vw,520px);padding:22px;border-radius:18px;background:#fff;color:#0f172a;box-shadow:0 24px 70px rgba(0,0,0,.45)}.recovery-dialog h2{margin-bottom:10px}.recovery-dialog p{margin:0 0 16px;color:#334155;line-height:1.5}.recovery-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}.recovery-metrics div{padding:11px;border-radius:11px;background:#eef6ff;text-align:center}.recovery-metrics strong,.recovery-metrics span{display:block}.recovery-metrics strong{font-size:12px;color:#475569}.recovery-metrics span{margin-top:4px;font-size:20px;font-weight:900;color:#075db1}.recovery-actions{display:grid;gap:9px}.recovery-actions .finish-open-pallet{background:linear-gradient(180deg,var(--success),var(--success2))}@media(max-width:620px){.recovery-dialog{padding:17px}.recovery-metrics{grid-template-columns:1fr}.recovery-metrics div{display:flex;align-items:center;justify-content:space-between}.recovery-metrics span{margin:0;font-size:18px}}
 </style>
 </head>
 <body>
@@ -41,7 +42,7 @@
 <div class="input-group full qr-operational-field"><label>Observações</label><input type="text" id="campoObservacoes" maxlength="250"></div>
 </div><div class="actions"><div id="acoesComposicao" class="actions"><button id="btnAdicionarMais" class="btn-blue" type="button" onclick="salvarComposicao(false)">ADICIONAR MAIS AO PALETE</button><button id="btnFinalizarPalete" class="btn-primary" type="button" onclick="salvarComposicao(true)">FINALIZAR PALETE</button></div><button id="btnLerQrAtual" class="btn-secondary" type="button" onclick="abrirLeitorQr()">Ler QR neste palete</button><button class="btn-secondary" type="button" onclick="voltarEscolhaFluxo()">Voltar</button><button id="btnExcel" onclick="gerarExcel()">Gerar Excel e Salvar</button><button id="btnReiniciar" class="btn-danger" onclick="reiniciarEntradas()">Reiniciar Entradas</button></div></section>
 <section class="card"><div class="card-header"><h2>Entradas</h2><span class="badge">Lista</span></div><div class="table-container" id="tableContainer"><table id="tabela"><thead><tr><th onclick="ordenarTabela(0)">DATA</th><th onclick="ordenarTabela(1)">SKU</th><th onclick="ordenarTabela(2)">PALETE</th><th onclick="ordenarTabela(3)">LOTE COMPLETO</th><th>LOTE</th><th>POST</th><th>CX</th><th>OBSERVAÇÕES</th><th>AÇÃO</th></tr></thead><tbody></tbody></table><div class="empty-state" id="emptyState"><div class="empty-icon">📋</div><strong>Nenhuma entrada encontrada</strong><span>Preencha o formulário para adicionar o primeiro romaneio.</span></div></div></section>
-</main><footer class="footer">🛡️ <strong>Romaneio Paletes</strong> &nbsp;•&nbsp; Dados salvos localmente no aparelho<div class="app-version">Versão <span id="appVersion">1.4.2</span></div></footer></div><button class="fab" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+</main><footer class="footer">🛡️ <strong>Romaneio Paletes</strong> &nbsp;•&nbsp; Dados salvos localmente no aparelho<div class="app-version">Versão <span id="appVersion">1.4.3</span></div></footer></div><button class="fab" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
 <div id="updateBanner" class="update-banner" aria-live="polite">
   <div><strong>🚀 Nova versão disponível</strong><span>Toque para atualizar o app.</span></div>
@@ -52,10 +53,15 @@
   <button id="installNowBtn" type="button">Instalar</button>
   <button id="installCloseBtn" type="button" class="banner-close" aria-label="Fechar">×</button>
 </div>
+<div id="recoveryOverlay" class="recovery-overlay" role="dialog" aria-modal="true" aria-labelledby="recoveryTitle">
+  <div class="recovery-dialog"><h2 id="recoveryTitle">PALETE EM ABERTO</h2><p id="recoveryMessage">Existe um palete que ainda não foi finalizado. Deseja continuar adicionando itens ou finalizar esse palete?</p><div class="recovery-metrics"><div><strong>Palete</strong><span id="recoveryPallet">-</span></div><div><strong>Itens</strong><span id="recoveryItems">0</span></div><div><strong>Total de caixas</strong><span id="recoveryBoxes">0</span></div></div><div class="recovery-actions"><button class="btn-primary" type="button" onclick="continuarPaleteAberto()">ADICIONAR MAIS AO PALETE</button><button class="finish-open-pallet" type="button" onclick="finalizarPaleteAbertoSemRegistro()">FINALIZAR PALETE</button></div></div>
+</div>
 
 <script>
-const APP_VERSION = "1.4.2";
+const APP_VERSION = "1.4.3";
 const VERSION_URL = "version.json";
+const ESTADO_OPERACIONAL_KEY = "romaneio_estado_operacional";
+const RASCUNHO_KEY = "romaneio_rascunho";
 let fluxoEntrada = null;
 let cameraStream = null;
 let scanFrameId = null;
@@ -73,6 +79,131 @@ function dataLocalISO() {
     return `${ano}-${mes}-${dia}`;
 }
 
+function lerJsonLocalStorage(chave, valorPadrao) {
+    try {
+        const valor = JSON.parse(localStorage.getItem(chave));
+        return valor ?? valorPadrao;
+    } catch (_) {
+        return valorPadrao;
+    }
+}
+
+function lerEstadoOperacional() {
+    const estado = lerJsonLocalStorage(ESTADO_OPERACIONAL_KEY, null);
+    if (!estado || estado.paleteAberto !== true || !estado.paleteAtual) return null;
+    return { paleteAtual: String(estado.paleteAtual), paleteAberto: true };
+}
+
+function persistirPaleteAberto(numero) {
+    paleteAtual = String(numero);
+    localStorage.setItem(ESTADO_OPERACIONAL_KEY, JSON.stringify({ paleteAtual, paleteAberto: true }));
+}
+
+function finalizarEstadoPalete() {
+    localStorage.setItem(ESTADO_OPERACIONAL_KEY, JSON.stringify({ paleteAtual: null, paleteAberto: false }));
+    paleteAtual = null;
+}
+
+function lerRascunho() {
+    const rascunho = lerJsonLocalStorage(RASCUNHO_KEY, null);
+    return rascunho && rascunho.palete ? rascunho : null;
+}
+
+function salvarRascunhoAtual() {
+    if (indiceEditando !== null || paleteAtual === null) return;
+    const rascunho = {
+        data: campoData.value,
+        sku: campoSku.value,
+        palete: String(paleteAtual),
+        loteCompleto: campoLote.value,
+        lote: campoLote3.value,
+        postura: campoLote10.value,
+        caixas: campoCaixas.value,
+        observacoes: campoObservacoes.value,
+        origem: fluxoEntrada || "manual"
+    };
+    if (![rascunho.sku, rascunho.lote, rascunho.postura, rascunho.caixas, rascunho.observacoes].some(valor => String(valor || "").trim())) return;
+    localStorage.setItem(RASCUNHO_KEY, JSON.stringify(rascunho));
+}
+
+function limparRascunho() {
+    localStorage.removeItem(RASCUNHO_KEY);
+}
+
+function restaurarRascunho(rascunho) {
+    if (!rascunho) return false;
+    paleteAtual = String(rascunho.palete);
+    usarInsercaoManual();
+    campoData.value = rascunho.data || "";
+    campoSku.value = rascunho.sku || "";
+    campoPalete.value = paleteAtual;
+    campoLote3.value = rascunho.lote || "";
+    campoLote10.value = rascunho.postura || "";
+    campoLote.value = rascunho.loteCompleto || "";
+    campoCaixas.value = rascunho.caixas || "";
+    campoObservacoes.value = rascunho.observacoes || "";
+    fluxoEntrada = rascunho.origem === "qr" ? "qr" : "manual";
+    if (fluxoEntrada === "qr") {
+        const formulario = document.getElementById("formEntrada");
+        formulario.classList.add("qr-mode");
+        formulario.classList.remove("qr-scanning");
+        document.getElementById("tituloEntrada").textContent = "Leitura de QR Code";
+        document.getElementById("badgeEntrada").textContent = "QR recuperado";
+        document.getElementById("qrResumoSku").textContent = campoSku.value;
+        document.getElementById("qrResumoLote").textContent = campoLote3.value;
+        document.getElementById("qrResumoPostura").textContent = campoLote10.value;
+        document.getElementById("qrResumoCompleto").textContent = campoLote.value;
+        document.getElementById("qrResumo").classList.remove("hidden");
+    }
+    atualizarResumoPaleteAtual();
+    return true;
+}
+
+function resumoDoPalete(numero) {
+    const linhas = Array.from(document.querySelectorAll("#tabela tbody tr"))
+        .filter(linha => String(linha.cells[2]?.textContent || "") === String(numero));
+    return {
+        itens: linhas.length,
+        caixas: linhas.reduce((total, linha) => total + Number(linha.cells[6]?.textContent || 0), 0)
+    };
+}
+
+function mostrarAvisoPaleteAberto(temRascunho = false) {
+    const estado = lerEstadoOperacional();
+    if (!estado) return;
+    paleteAtual = estado.paleteAtual;
+    const resumo = resumoDoPalete(paleteAtual);
+    document.getElementById("recoveryPallet").textContent = paleteAtual;
+    document.getElementById("recoveryItems").textContent = String(resumo.itens);
+    document.getElementById("recoveryBoxes").textContent = String(resumo.caixas);
+    document.getElementById("recoveryMessage").textContent = temRascunho
+        ? "Existe uma inclusão não concluída neste palete. Seus campos foram restaurados para você continuar ou finalizar o palete sem adicionar essa inclusão."
+        : "Existe um palete que ainda não foi finalizado. Deseja continuar adicionando itens ou finalizar esse palete?";
+    document.getElementById("recoveryOverlay").classList.add("show");
+}
+
+function esconderAvisoPaleteAberto() {
+    document.getElementById("recoveryOverlay").classList.remove("show");
+}
+
+function continuarPaleteAberto() {
+    esconderAvisoPaleteAberto();
+    const rascunho = lerRascunho();
+    if (rascunho && String(rascunho.palete) === String(paleteAtual)) {
+        if (document.getElementById("formEntrada").classList.contains("hidden")) restaurarRascunho(rascunho);
+        return;
+    }
+    abrirLeitorQr();
+}
+
+function finalizarPaleteAbertoSemRegistro() {
+    pararCamera();
+    limparRascunho();
+    finalizarEstadoPalete();
+    esconderAvisoPaleteAberto();
+    exibirPaginaInicial();
+}
+
 function proximoNumeroPalete() {
     const numeros = Array.from(document.querySelectorAll("#tabela tbody tr"))
         .map((linha) => String(linha.cells[2]?.textContent || "").trim())
@@ -83,7 +214,11 @@ function proximoNumeroPalete() {
 }
 
 function garantirPaleteAtual() {
-    if (paleteAtual === null) paleteAtual = proximoNumeroPalete();
+    if (paleteAtual === null) {
+        const estado = lerEstadoOperacional();
+        paleteAtual = estado ? estado.paleteAtual : String(proximoNumeroPalete());
+    }
+    if (indiceEditando === null) persistirPaleteAberto(paleteAtual);
     campoPalete.value = String(paleteAtual);
     atualizarResumoPaleteAtual();
     return paleteAtual;
@@ -250,6 +385,7 @@ function preencherFormularioComQr(texto) {
     document.getElementById("qrPanel").classList.add("hidden");
     document.getElementById("qrResumo").classList.remove("hidden");
     document.getElementById("formEntrada").classList.remove("qr-scanning");
+    salvarRascunhoAtual();
     campoCaixas.focus();
 }
 
@@ -272,7 +408,7 @@ function usarInsercaoManual() {
     configurarAcoesComposicao(indiceEditando !== null);
 }
 
-function voltarEscolhaFluxo() {
+function exibirPaginaInicial() {
     pararCamera();
     limparCampos();
     fluxoEntrada = null;
@@ -282,9 +418,29 @@ function voltarEscolhaFluxo() {
     document.getElementById("escolhaFluxo").classList.remove("hidden");
 }
 
-window.addEventListener("pagehide", pararCamera);
+function voltarEscolhaFluxo() {
+    salvarRascunhoAtual();
+    exibirPaginaInicial();
+    if (lerEstadoOperacional()) setTimeout(() => mostrarAvisoPaleteAberto(Boolean(lerRascunho())), 0);
+}
+
+window.addEventListener("pagehide", () => {
+    salvarRascunhoAtual();
+    pararCamera();
+});
 document.addEventListener("visibilitychange", () => {
-    if (document.hidden) pararCamera();
+    if (document.hidden) {
+        salvarRascunhoAtual();
+        pararCamera();
+    }
+});
+
+const CAMPOS_RASCUNHO = new Set(["campoData", "campoSku", "campoLote3", "campoLote10", "campoCaixas", "campoObservacoes"]);
+document.addEventListener("input", event => {
+    if (event.target && CAMPOS_RASCUNHO.has(event.target.id)) salvarRascunhoAtual();
+});
+document.addEventListener("change", event => {
+    if (event.target && CAMPOS_RASCUNHO.has(event.target.id)) salvarRascunhoAtual();
 });
 
 function formatarLote() {
@@ -376,7 +532,8 @@ function salvarLocalStorage() {
 }
 
 function carregarLocalStorage() {
-    let dados = JSON.parse(localStorage.getItem("entradas") || "[]");
+    let dados = lerJsonLocalStorage("entradas", []);
+    if (!Array.isArray(dados)) dados = [];
     let tbody = document.querySelector("#tabela tbody");
 
     dados.forEach(item => {
@@ -388,6 +545,12 @@ function carregarLocalStorage() {
 window.onload = function() {
     carregarLocalStorage();
     iniciarInterfaceVisual();
+    const estado = lerEstadoOperacional();
+    if (!estado) return;
+    paleteAtual = estado.paleteAtual;
+    const rascunho = lerRascunho();
+    const restaurado = Boolean(rascunho && String(rascunho.palete) === paleteAtual && restaurarRascunho(rascunho));
+    setTimeout(() => mostrarAvisoPaleteAberto(restaurado), 0);
 };
 
 function limparCampos() {
@@ -439,6 +602,7 @@ function salvarEntrada() {
     }
 
     salvarLocalStorage();
+    limparRascunho();
     limparCampos();
     atualizarResumoPaleteAtual();
     return true;
@@ -446,22 +610,22 @@ function salvarEntrada() {
 
 function salvarComposicao(finalizarPalete) {
     const editando = indiceEditando !== null;
-    const modoAtual = fluxoEntrada;
     if (!salvarEntrada()) return false;
 
     if (editando) {
         paleteAtual = null;
-        voltarEscolhaFluxo();
+        exibirPaginaInicial();
         return true;
     }
 
-    if (finalizarPalete) paleteAtual = null;
-
-    if (modoAtual === "qr") {
-        setTimeout(abrirLeitorQr, 0);
-    } else {
-        usarInsercaoManual();
+    if (finalizarPalete) {
+        finalizarEstadoPalete();
+        exibirPaginaInicial();
+        return true;
     }
+
+    persistirPaleteAberto(paleteAtual);
+    setTimeout(abrirLeitorQr, 0);
     return true;
 }
 
@@ -494,14 +658,17 @@ function excluirLinha(botao) {
 }
 
 function reiniciarEntradas() {
-    if (!confirm("Tem certeza que deseja apagar todas as entradas?")) return;
+    if (!confirm("Deseja realmente apagar todas as entradas e reiniciar o romaneio?\nEsta ação apagará também qualquer palete atualmente aberto.")) return;
 
     localStorage.removeItem("entradas");
+    localStorage.removeItem(ESTADO_OPERACIONAL_KEY);
+    localStorage.removeItem(RASCUNHO_KEY);
 
     let tbody = document.querySelector("#tabela tbody");
     tbody.innerHTML = "";
     paleteAtual = null;
-    if (!document.getElementById("formEntrada").classList.contains("hidden")) garantirPaleteAtual();
+    esconderAvisoPaleteAberto();
+    exibirPaginaInicial();
 
     alert("Entradas apagadas com sucesso.");
 }
