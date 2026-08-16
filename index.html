@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Romaneio Paletes</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0b1320">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="jsQR.js"></script>
+<script src="export-utils.js"></script>
+<script src="qr-parser.js"></script>
+<style>
+:root{--bg:#07111d;--panel:#ffffff;--text:#0f172a;--muted:#64748b;--line:#d9e2ec;--input:#fbfdff;--input-disabled:#edf2f7;--primary:#0875f5;--primary2:#055fc9;--success:#2eba4f;--success2:#159138;--danger:#ff3030;--danger2:#d71919;--yellow:#ffc107;--shadow:0 22px 50px rgba(0,0,0,.30);--radius:18px}*{box-sizing:border-box}html{scroll-behavior:smooth;width:100%;overflow-x:hidden}body{overflow-x:hidden}img,table,input,button{max-width:100%}body{margin:0;min-height:100vh;font-family:Arial,Roboto,sans-serif;background:radial-gradient(circle at top left,rgba(8,117,209,.30),transparent 30%),linear-gradient(135deg,#06111d 0%,#11171f 48%,#17191d 100%);color:var(--text);padding:18px 18px 80px}.app{width:100%;max-width:1220px;margin:0 auto}.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px;margin-bottom:18px;border-radius:24px;background:linear-gradient(135deg,rgba(15,30,45,.92),rgba(39,39,39,.94));border:1px solid rgba(255,255,255,.14);box-shadow:0 22px 48px rgba(0,0,0,.26);backdrop-filter:blur(14px)}.brand{display:flex;align-items:center;gap:16px;color:#fff}.brand-icon{width:58px;height:58px;border-radius:18px;background:#fff;padding:5px;box-shadow:0 12px 30px rgba(255,193,7,.28);object-fit:contain}.brand h1{margin:0;font-size:30px;line-height:1.05}.brand p{margin:7px 0 0;color:rgba(255,255,255,.72);font-size:15px}.status-pill{color:#fff;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.16);padding:12px 18px;border-radius:999px;font-weight:800;white-space:nowrap;box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}.dashboard{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}.metric{background:rgba(255,255,255,.98);border-radius:18px;padding:16px;box-shadow:var(--shadow);display:flex;align-items:center;gap:13px}.metric .ico{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:25px;background:#fff4ce}.metric:nth-child(2) .ico{background:#e0f2fe}.metric:nth-child(3) .ico{background:#dcfce7}.metric:nth-child(4) .ico{background:#ede9fe}.metric b{display:block;font-size:27px;color:#075db1;line-height:1}.metric span{display:block;margin-top:5px;color:var(--muted);font-weight:700;font-size:13px}.layout{display:grid;grid-template-columns:minmax(310px,420px) 1fr;gap:18px;align-items:start}.card{background:rgba(255,255,255,.98);border:1px solid rgba(255,255,255,.70);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}.form-card{position:sticky;top:18px}.card-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}h2{margin:0;font-size:24px;color:var(--text);letter-spacing:-.3px}.badge{display:inline-flex;align-items:center;gap:7px;padding:10px 14px;border-radius:14px;color:#075db1;background:#e0f2fe;font-size:14px;font-weight:800}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}.full{grid-column:1/-1}.input-group{margin-bottom:14px}label{display:block;font-size:13px;font-weight:800;color:#233047;margin-bottom:8px}input{width:100%;height:45px;padding:10px 14px;border-radius:11px;border:1px solid #cfd8e3;background:var(--input);color:#111827;font-size:15px;outline:none;transition:.2s ease;box-shadow:inset 0 1px 2px rgba(15,23,42,.03)}input:focus{border-color:var(--primary);background:#fff;box-shadow:0 0 0 4px rgba(8,117,209,.12)}input:disabled{color:#667085;background:var(--input-disabled)}.actions{display:grid;gap:8px;margin-top:6px}button{width:100%;padding:13px 20px;border:0;border-radius:10px;color:#fff;font-size:16px;font-weight:800;cursor:pointer;transition:.2s ease}button:hover{transform:translateY(-1px);filter:brightness(1.03)}button:active{transform:translateY(0)}.btn-primary{background:linear-gradient(180deg,var(--primary),var(--primary2));box-shadow:0 10px 20px rgba(8,117,209,.24),inset 0 1px 0 rgba(255,255,255,.20)}.btn-blue{background:linear-gradient(180deg,#f59e0b,#d97706);box-shadow:0 10px 20px rgba(245,158,11,.22),inset 0 1px 0 rgba(255,255,255,.20)}.btn-danger{background:linear-gradient(180deg,var(--danger),var(--danger2));box-shadow:0 10px 20px rgba(239,45,45,.22),inset 0 1px 0 rgba(255,255,255,.20)}#btnExcel{background:linear-gradient(180deg,var(--success),var(--success2));box-shadow:0 10px 20px rgba(34,164,71,.24),inset 0 1px 0 rgba(255,255,255,.20)}.table-container{position:relative;overflow-x:auto;border-radius:13px;border:1px solid var(--line);background:#fff}.table-container.is-empty{min-height:340px}table{width:100%;border-collapse:separate;border-spacing:0;background:#fff;min-width:840px;color:var(--text)}th,td{border:0;border-bottom:1px solid #edf2f7;padding:14px 12px;text-align:center;font-size:13px;white-space:nowrap}th{position:sticky;top:0;z-index:2;background:#f1f5f9;color:#172238;font-size:12px;letter-spacing:.4px;font-weight:900;cursor:pointer}tbody tr:nth-child(even){background:#f8fafc}tbody tr:hover{background:#eef6ff}tbody tr:last-child td{border-bottom:0}td .btn-blue,td .btn-danger{width:auto;padding:8px 10px;margin:2px;font-size:12px;border-radius:9px;box-shadow:none}.empty-state{display:none;min-height:275px;align-items:center;justify-content:center;flex-direction:column;text-align:center;color:#0f172a;padding:24px}.empty-icon{width:86px;height:86px;border-radius:50%;border:1px solid #d4dde8;display:flex;align-items:center;justify-content:center;color:#8a94a3;font-size:42px;margin-bottom:18px}.empty-state strong{font-size:20px;margin-bottom:8px}.empty-state span{color:#334155;font-size:16px;line-height:1.45;max-width:390px}.footer{margin-top:18px;padding:12px 18px;border-radius:18px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.10);color:rgba(255,255,255,.76);text-align:center;font-size:14px;box-shadow:0 14px 32px rgba(0,0,0,.18)}.footer strong{color:#fff}.fab{position:fixed;right:16px;bottom:18px;width:50px;height:50px;border-radius:50%;padding:0;background:linear-gradient(180deg,var(--primary),var(--primary2));box-shadow:0 12px 26px rgba(8,117,245,.32);font-size:24px}::-webkit-scrollbar{height:12px;width:12px}::-webkit-scrollbar-track{background:rgba(226,232,240,.8);border-radius:999px}::-webkit-scrollbar-thumb{background:#9aa0a6;border-radius:999px}@media(max-width:980px){.dashboard{grid-template-columns:repeat(2,1fr)}.layout{grid-template-columns:1fr}.form-card{position:static}}@media(max-width:620px){body{padding:8px 8px 74px;width:100%;min-width:0}.app{max-width:100%;width:100%;min-width:0}.topbar{padding:12px;border-radius:18px;align-items:flex-start;flex-direction:column}.brand{gap:10px;width:100%;min-width:0}.brand-icon{width:48px;height:48px;border-radius:15px}.brand h1{font-size:22px}.brand p{font-size:12px}.status-pill{display:none}.dashboard{grid-template-columns:1fr;gap:8px;margin-bottom:10px}.metric{padding:10px;gap:9px;border-radius:15px}.metric .ico{width:36px;height:36px;font-size:19px}.metric b{font-size:20px}.metric span{font-size:12px}.layout{gap:10px}.card{padding:12px;border-radius:16px;min-width:0}.form-grid{grid-template-columns:1fr;gap:0}.card-header{align-items:flex-start;gap:8px;flex-wrap:wrap;margin-bottom:12px}.badge{font-size:12px;padding:7px 9px}h2{font-size:20px}label{font-size:12px;margin-bottom:6px}.input-group{margin-bottom:10px}input{height:46px;font-size:16px;padding:9px 11px;min-width:0}button{min-height:45px;padding:11px 12px;font-size:15px}.actions{gap:7px}.empty-state{min-height:240px}.footer{font-size:12px;padding:10px;margin-top:10px}.fab{bottom:12px;right:10px;width:46px;height:46px}}
+
+.flow-card{grid-column:1/-1;text-align:center}.flow-card p{color:var(--muted);margin:6px 0 18px}.flow-actions{display:grid;grid-template-columns:2fr 1fr;gap:10px}.btn-secondary{background:linear-gradient(180deg,#475569,#334155)}.qr-panel{margin-bottom:15px;padding:12px;border-radius:14px;background:#07111d;color:#fff}.qr-video{display:block;width:100%;max-height:360px;border-radius:10px;background:#000;object-fit:cover}.qr-status{margin:10px 0 0;line-height:1.4}.qr-summary{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px}.qr-summary div{padding:10px;border:1px solid var(--line);border-radius:10px;background:#f8fafc}.qr-summary strong,.qr-summary span{display:block}.qr-summary strong{font-size:12px;color:var(--muted);margin-bottom:4px}.palete-andamento{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:14px;padding:11px;border-radius:11px;background:#e0f2fe;color:#075db1;font-weight:800}.qr-mode .manual-field{display:none}.qr-scanning .qr-operational-field,.qr-scanning #acoesComposicao{display:none}.camera-actions{display:flex;gap:8px;margin-top:10px}.camera-actions button{font-size:14px}.hidden{display:none!important}@media(max-width:620px){.flow-actions,.qr-summary{grid-template-columns:1fr}.flow-actions button{min-height:58px}.camera-actions{flex-direction:column}}
+
+</style>
+</head>
+<body>
+<div class="app">
+<header class="topbar"><div class="brand"><img src="icon-512.png" class="brand-icon" alt="Logo"><div><h1>Romaneio Paletes</h1><p>Sistema local para controle de paletes</p></div></div><div class="status-pill">💾 Dados salvos no aparelho</div></header>
+<section class="dashboard"><div class="metric"><div class="ico">📋</div><div><b id="dashRegistros">0</b><span>Registros</span></div></div><div class="metric"><div class="ico">📦</div><div><b id="dashCaixas">0</b><span>Caixas</span></div></div><div class="metric"><div class="ico">🧱</div><div><b id="dashPaletes">0</b><span>Paletes</span></div></div><div class="metric"><div class="ico">🕒</div><div><b id="dashUltimo">--</b><span>Último registro</span></div></div></section>
+<main class="layout">
+<section class="card flow-card" id="escolhaFluxo"><div class="card-header"><h2>Adicionar palete</h2><span class="badge">Nova entrada</span></div><p>Leia a etiqueta do palete ou utilize o preenchimento manual.</p><div class="flow-actions"><button class="btn-primary" type="button" onclick="abrirLeitorQr()">📷 LER QR CODE</button><button class="btn-secondary" type="button" onclick="usarInsercaoManual()">PALETE MISTO / INSERÇÃO MANUAL</button></div></section>
+<section class="card form-card hidden" id="formEntrada"><div class="card-header"><h2 id="tituloEntrada">Romaneio Paletes</h2><span class="badge" id="badgeEntrada">Entrada</span></div>
+<div class="palete-andamento" id="paleteAndamento"><span>PALETE <b id="numeroPaleteAtual">1</b></span><span>Itens: <b id="itensPaleteAtual">0</b></span><span>Total de caixas: <b id="caixasPaleteAtual">0</b></span></div>
+<div class="qr-panel hidden" id="qrPanel"><video id="qrVideo" class="qr-video" playsinline muted></video><canvas id="qrCanvas" class="hidden"></canvas><p class="qr-status" id="qrStatus" aria-live="polite">Aponte a câmera para o QR Code.</p><div class="camera-actions"><button class="btn-secondary" type="button" onclick="cancelarLeitorQr()">Cancelar leitura</button><button class="btn-blue" type="button" onclick="usarInsercaoManual()">Usar inserção manual</button></div></div>
+<div class="qr-summary hidden" id="qrResumo"><div><strong>SKU</strong><span id="qrResumoSku"></span></div><div><strong>Lote</strong><span id="qrResumoLote"></span></div><div><strong>Data de Postura</strong><span id="qrResumoPostura"></span></div><div><strong>Lote Completo</strong><span id="qrResumoCompleto"></span></div></div>
+<div class="form-grid">
+<div class="input-group manual-field"><label>Data</label><input type="date" id="campoData"></div>
+<div class="input-group manual-field"><label>SKU</label><input type="text" id="campoSku"></div>
+<div class="input-group full manual-field"><label>Palete</label><input type="text" id="campoPalete" disabled placeholder="Automático ao salvar"></div>
+<div class="input-group manual-field"><label>Lote (formato Lxx.xx)</label><input type="text" id="campoLote3" maxlength="6" oninput="formatarLote()"></div>
+<div class="input-group manual-field"><label>Data de Postura (formato .xx.xx.xx)</label><input type="text" id="campoLote10" maxlength="9" oninput="formatarPostura()"></div>
+<div class="input-group full manual-field"><label>Lote Completo</label><input type="text" id="campoLote" disabled></div>
+<div class="input-group full qr-operational-field"><label>Quantidade de Caixas</label><input type="number" id="campoCaixas" min="1"></div>
+<div class="input-group full qr-operational-field"><label>Observações</label><input type="text" id="campoObservacoes" maxlength="250"></div>
+</div><div class="actions"><div id="acoesComposicao" class="actions"><button id="btnAdicionarMais" class="btn-blue" type="button" onclick="salvarComposicao(false)">ADICIONAR MAIS AO PALETE</button><button id="btnFinalizarPalete" class="btn-primary" type="button" onclick="salvarComposicao(true)">FINALIZAR PALETE</button></div><button id="btnLerQrAtual" class="btn-secondary" type="button" onclick="abrirLeitorQr()">Ler QR neste palete</button><button class="btn-secondary" type="button" onclick="voltarEscolhaFluxo()">Voltar</button><button id="btnExcel" onclick="gerarExcel()">Gerar Excel e Salvar</button><button id="btnReiniciar" class="btn-danger" onclick="reiniciarEntradas()">Reiniciar Entradas</button></div></section>
+<section class="card"><div class="card-header"><h2>Entradas</h2><span class="badge">Lista</span></div><div class="table-container" id="tableContainer"><table id="tabela"><thead><tr><th onclick="ordenarTabela(0)">DATA</th><th onclick="ordenarTabela(1)">SKU</th><th onclick="ordenarTabela(2)">PALETE</th><th onclick="ordenarTabela(3)">LOTE COMPLETO</th><th>LOTE</th><th>POST</th><th>CX</th><th>OBSERVAÇÕES</th><th>AÇÃO</th></tr></thead><tbody></tbody></table><div class="empty-state" id="emptyState"><div class="empty-icon">📋</div><strong>Nenhuma entrada encontrada</strong><span>Preencha o formulário para adicionar o primeiro romaneio.</span></div></div></section>
+</main><footer class="footer">🛡️ <strong>Romaneio Paletes</strong> &nbsp;•&nbsp; Dados salvos localmente no aparelho<div class="app-version">Versão <span id="appVersion">1.4.1</span></div></footer></div><button class="fab" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<div id="updateBanner" class="update-banner" aria-live="polite">
+  <div><strong>🚀 Nova versão disponível</strong><span>Toque para atualizar o app.</span></div>
+  <button id="updateNowBtn" type="button">Atualizar agora</button>
+</div>
+<div id="installBanner" class="install-banner" aria-live="polite">
+  <div><strong>📲 Instalar aplicativo</strong><span>Use como app no celular.</span></div>
+  <button id="installNowBtn" type="button">Instalar</button>
+  <button id="installCloseBtn" type="button" class="banner-close" aria-label="Fechar">×</button>
+</div>
+
+<script>
+const APP_VERSION = "1.4.1";
+const VERSION_URL = "version.json";
+let fluxoEntrada = null;
+let cameraStream = null;
+let scanFrameId = null;
+let leituraTravada = false;
+let decodificandoQr = false;
+let ultimoFrameQr = 0;
+let detectorQr = null;
+let paleteAtual = null;
+
+function dataLocalISO() {
+    const agora = new Date();
+    const ano = agora.getFullYear();
+    const mes = String(agora.getMonth() + 1).padStart(2, "0");
+    const dia = String(agora.getDate()).padStart(2, "0");
+    return `${ano}-${mes}-${dia}`;
+}
+
+function proximoNumeroPalete() {
+    const numeros = Array.from(document.querySelectorAll("#tabela tbody tr"))
+        .map((linha) => String(linha.cells[2]?.textContent || "").trim())
+        .map((valor) => /^(?:palete\s*)?(\d+)$/i.exec(valor))
+        .filter(Boolean)
+        .map((resultado) => Number(resultado[1]));
+    return (numeros.length ? Math.max(...numeros) : 0) + 1;
+}
+
+function garantirPaleteAtual() {
+    if (paleteAtual === null) paleteAtual = proximoNumeroPalete();
+    campoPalete.value = String(paleteAtual);
+    atualizarResumoPaleteAtual();
+    return paleteAtual;
+}
+
+function atualizarResumoPaleteAtual() {
+    if (paleteAtual === null) return;
+    const linhas = Array.from(document.querySelectorAll("#tabela tbody tr"))
+        .filter((linha) => String(linha.cells[2]?.textContent || "") === String(paleteAtual));
+    const caixas = linhas.reduce((total, linha) => total + Number(linha.cells[6]?.textContent || 0), 0);
+    document.getElementById("numeroPaleteAtual").textContent = String(paleteAtual);
+    document.getElementById("itensPaleteAtual").textContent = String(linhas.length);
+    document.getElementById("caixasPaleteAtual").textContent = String(caixas);
+}
+
+function configurarAcoesComposicao(editando) {
+    document.getElementById("btnAdicionarMais").classList.toggle("hidden", editando);
+    document.getElementById("btnLerQrAtual").classList.toggle("hidden", editando);
+    document.getElementById("btnFinalizarPalete").textContent = editando ? "Salvar Alterações" : "FINALIZAR PALETE";
+}
+
+function pararCamera() {
+    if (scanFrameId !== null) cancelAnimationFrame(scanFrameId);
+    scanFrameId = null;
+    leituraTravada = true;
+    decodificandoQr = false;
+
+    if (cameraStream) {
+        cameraStream.getTracks().forEach((track) => track.stop());
+        cameraStream = null;
+    }
+
+    const video = document.getElementById("qrVideo");
+    if (video) {
+        video.pause();
+        video.srcObject = null;
+    }
+}
+
+function mostrarFalhaQr(mensagem) {
+    const status = document.getElementById("qrStatus");
+    if (status) status.textContent = `${mensagem} Use a inserção manual para continuar.`;
+}
+
+async function abrirLeitorQr() {
+    pararCamera();
+    limparCampos();
+    fluxoEntrada = "qr";
+    leituraTravada = false;
+    garantirPaleteAtual();
+    configurarAcoesComposicao(false);
+
+    const escolha = document.getElementById("escolhaFluxo");
+    const formulario = document.getElementById("formEntrada");
+    escolha.classList.add("hidden");
+    formulario.classList.remove("hidden");
+    formulario.classList.add("qr-mode", "qr-scanning");
+    document.getElementById("qrPanel").classList.remove("hidden");
+    document.getElementById("qrResumo").classList.add("hidden");
+    document.getElementById("tituloEntrada").textContent = "Leitura de QR Code";
+    document.getElementById("badgeEntrada").textContent = "QR";
+    document.getElementById("qrStatus").textContent = "Solicitando acesso à câmera...";
+    campoData.value = dataLocalISO();
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        mostrarFalhaQr("Câmera não disponível neste navegador.");
+        return;
+    }
+
+    if (!("BarcodeDetector" in window) && typeof window.jsQR !== "function") {
+        mostrarFalhaQr("Leitor de QR indisponível.");
+        return;
+    }
+
+    try {
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: { ideal: "environment" } },
+            audio: false
+        });
+
+        const video = document.getElementById("qrVideo");
+        video.srcObject = cameraStream;
+        await video.play();
+
+        if ("BarcodeDetector" in window) {
+            try {
+                detectorQr = new BarcodeDetector({ formats: ["qr_code"] });
+            } catch (_) {
+                detectorQr = null;
+            }
+        }
+
+        document.getElementById("qrStatus").textContent = "Aponte a câmera para o QR Code.";
+        scanFrameId = requestAnimationFrame(processarQuadroQr);
+    } catch (_) {
+        pararCamera();
+        mostrarFalhaQr("Não foi possível acessar a câmera.");
+    }
+}
+
+async function processarQuadroQr(timestamp) {
+    if (!cameraStream || leituraTravada) return;
+    scanFrameId = requestAnimationFrame(processarQuadroQr);
+    if (decodificandoQr || timestamp - ultimoFrameQr < 120) return;
+
+    const video = document.getElementById("qrVideo");
+    if (!video || video.readyState < 2 || !video.videoWidth) return;
+
+    ultimoFrameQr = timestamp;
+    decodificandoQr = true;
+    let texto = "";
+
+    try {
+        if (detectorQr) {
+            try {
+                const codigos = await detectorQr.detect(video);
+                texto = codigos[0]?.rawValue || "";
+            } catch (_) {
+                detectorQr = null;
+            }
+        }
+
+        if (!texto && typeof window.jsQR === "function") {
+            const canvas = document.getElementById("qrCanvas");
+            const contexto = canvas.getContext("2d", { willReadFrequently: true });
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            contexto.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const pixels = contexto.getImageData(0, 0, canvas.width, canvas.height);
+            const resultado = window.jsQR(pixels.data, pixels.width, pixels.height, { inversionAttempts: "dontInvert" });
+            texto = resultado?.data || "";
+        }
+
+        if (texto) preencherFormularioComQr(texto);
+    } catch (_) {
+        // Uma falha em um quadro não encerra a câmera; o próximo quadro será tentado.
+    } finally {
+        decodificandoQr = false;
+    }
+}
+
+function preencherFormularioComQr(texto) {
+    let dados;
+    try {
+        dados = window.qrPaleteParser.parse(texto);
+    } catch (erro) {
+        const status = document.getElementById("qrStatus");
+        status.textContent = `${erro.message} Aponte para um QR válido.`;
+        return;
+    }
+
+    leituraTravada = true;
+    campoSku.value = dados.sku;
+    campoLote3.value = dados.lote;
+    campoLote10.value = dados.postura;
+    montarLoteCompleto();
+
+    document.getElementById("qrResumoSku").textContent = dados.sku;
+    document.getElementById("qrResumoLote").textContent = dados.lote;
+    document.getElementById("qrResumoPostura").textContent = dados.postura;
+    document.getElementById("qrResumoCompleto").textContent = campoLote.value;
+
+    pararCamera();
+    document.getElementById("qrPanel").classList.add("hidden");
+    document.getElementById("qrResumo").classList.remove("hidden");
+    document.getElementById("formEntrada").classList.remove("qr-scanning");
+    campoCaixas.focus();
+}
+
+function cancelarLeitorQr() {
+    pararCamera();
+    voltarEscolhaFluxo();
+}
+
+function usarInsercaoManual() {
+    pararCamera();
+    fluxoEntrada = "manual";
+    document.getElementById("escolhaFluxo").classList.add("hidden");
+    const formulario = document.getElementById("formEntrada");
+    formulario.classList.remove("hidden", "qr-mode", "qr-scanning");
+    document.getElementById("qrPanel").classList.add("hidden");
+    document.getElementById("qrResumo").classList.add("hidden");
+    document.getElementById("tituloEntrada").textContent = indiceEditando === null ? "Palete misto / inserção manual" : "Editar entrada";
+    document.getElementById("badgeEntrada").textContent = indiceEditando === null ? "Manual" : "Edição";
+    garantirPaleteAtual();
+    configurarAcoesComposicao(indiceEditando !== null);
+}
+
+function voltarEscolhaFluxo() {
+    pararCamera();
+    limparCampos();
+    fluxoEntrada = null;
+    paleteAtual = null;
+    document.getElementById("formEntrada").classList.add("hidden");
+    document.getElementById("formEntrada").classList.remove("qr-mode", "qr-scanning");
+    document.getElementById("escolhaFluxo").classList.remove("hidden");
+}
+
+window.addEventListener("pagehide", pararCamera);
+document.addEventListener("visibilitychange", () => {
+    if (document.hidden) pararCamera();
+});
+
+function formatarLote() {
+    let v = campoLote3.value.replace(/\W/g, "");
+    v = v.substring(0, 5);
+
+    if (!v.startsWith("L")) v = "L" + v;
+
+    let bloco1 = v.substring(0,3);
+    let bloco2 = v.substring(3,5);
+
+    campoLote3.value = bloco1 + "." + bloco2;
+
+    montarLoteCompleto();
+}
+
+function formatarPostura() {
+    let v = campoLote10.value.replace(/\D/g, "");
+    v = v.substring(0, 6);
+
+    let formatado = ".";
+
+    if (v.length > 0) formatado += v.substring(0,2);
+    if (v.length > 2) formatado += "." + v.substring(2,4);
+    if (v.length > 4) formatado += "." + v.substring(4,6);
+
+    campoLote10.value = formatado;
+
+    montarLoteCompleto();
+}
+
+function montarLoteCompleto() {
+    let lote = campoLote3.value;
+    let postura = campoLote10.value;
+
+    if (lote.length === 6 && postura.length === 9) {
+        campoLote.value = lote + postura;
+    } else {
+        campoLote.value = "";
+    }
+}
+
+let indiceEditando = null;
+let ordemAsc = true;
+
+function preencherLinha(linha, item) {
+    linha.replaceChildren();
+    const valores = [item.data, item.sku, item.palete, item.loteCompleto, item.lote, item.postura, item.caixas, item.observacoes || ""];
+
+    valores.forEach((valor) => {
+        const celula = linha.insertCell();
+        celula.textContent = valor ?? "";
+    });
+
+    const acoes = linha.insertCell();
+    const editar = document.createElement("button");
+    editar.className = "btn-blue";
+    editar.type = "button";
+    editar.textContent = "Editar";
+    editar.addEventListener("click", () => editarLinha(editar));
+
+    const excluir = document.createElement("button");
+    excluir.className = "btn-danger";
+    excluir.type = "button";
+    excluir.textContent = "Excluir";
+    excluir.addEventListener("click", () => excluirLinha(excluir));
+    acoes.append(editar, excluir);
+}
+
+function salvarLocalStorage() {
+    let tbody = document.querySelector("#tabela tbody");
+    let dados = [];
+
+    for (let linha of tbody.rows) {
+        dados.push({
+            data: linha.cells[0].innerText,
+            sku: linha.cells[1].innerText,
+            palete: linha.cells[2].innerText,
+            loteCompleto: linha.cells[3].innerText,
+            lote: linha.cells[4].innerText,
+            postura: linha.cells[5].innerText,
+            caixas: linha.cells[6].innerText,
+            observacoes: linha.cells[7].innerText
+        });
+    }
+
+    localStorage.setItem("entradas", JSON.stringify(dados));
+    if (typeof atualizarDashboardVisual === "function") atualizarDashboardVisual();
+}
+
+function carregarLocalStorage() {
+    let dados = JSON.parse(localStorage.getItem("entradas") || "[]");
+    let tbody = document.querySelector("#tabela tbody");
+
+    dados.forEach(item => {
+        let linha = tbody.insertRow();
+        preencherLinha(linha, item);
+    });
+}
+
+window.onload = function() {
+    carregarLocalStorage();
+    iniciarInterfaceVisual();
+};
+
+function limparCampos() {
+    campoData.value = "";
+    campoSku.value = "";
+    campoPalete.value = "";
+    campoLote.value = "";
+    campoLote3.value = "";
+    campoLote10.value = "";
+    campoCaixas.value = "";
+    campoObservacoes.value = "";
+    indiceEditando = null;
+}
+
+function salvarEntrada() {
+    const tbody = document.querySelector("#tabela tbody");
+    const novoRegistro = indiceEditando === null;
+    if (novoRegistro) campoPalete.value = String(garantirPaleteAtual());
+
+    let dataISO = campoData.value;
+    let dataBR = formatarDataBR(dataISO);
+
+    let sku = campoSku.value.trim();
+    let palete = campoPalete.value;
+    let loteCompleto = campoLote.value;
+    let lote = campoLote3.value;
+    let postura = campoLote10.value;
+    let caixas = campoCaixas.value;
+    let observacoes = campoObservacoes.value.trim();
+
+    if (!dataISO || !sku || !palete || !loteCompleto || !caixas || Number(caixas) <= 0) {
+        alert("Preencha todos os campos obrigatórios.");
+        return false;
+    }
+
+    if (indiceEditando !== null) {
+        let linha = tbody.rows[indiceEditando];
+        linha.cells[0].textContent = dataBR;
+        linha.cells[1].textContent = sku;
+        linha.cells[2].textContent = palete;
+        linha.cells[3].textContent = loteCompleto;
+        linha.cells[4].textContent = lote;
+        linha.cells[5].textContent = postura;
+        linha.cells[6].textContent = caixas;
+        linha.cells[7].textContent = observacoes;
+    } else {
+        let linha = tbody.insertRow();
+        preencherLinha(linha, { data: dataBR, sku, palete, loteCompleto, lote, postura, caixas, observacoes });
+    }
+
+    salvarLocalStorage();
+    limparCampos();
+    atualizarResumoPaleteAtual();
+    return true;
+}
+
+function salvarComposicao(finalizarPalete) {
+    const editando = indiceEditando !== null;
+    const modoAtual = fluxoEntrada;
+    if (!salvarEntrada()) return false;
+
+    if (editando) {
+        paleteAtual = null;
+        voltarEscolhaFluxo();
+        return true;
+    }
+
+    if (finalizarPalete) paleteAtual = null;
+
+    if (modoAtual === "qr") {
+        setTimeout(abrirLeitorQr, 0);
+    } else {
+        usarInsercaoManual();
+    }
+    return true;
+}
+
+function editarLinha(botao) {
+    let linha = botao.parentNode.parentNode;
+    indiceEditando = linha.rowIndex - 1;
+
+    let dataBR = linha.cells[0].innerText;
+    let partes = dataBR.split("/");
+    campoData.value = `${partes[2]}-${partes[1]}-${partes[0]}`;
+
+    campoSku.value = linha.cells[1].innerText;
+    campoPalete.value = linha.cells[2].innerText;
+
+    campoLote.value = linha.cells[3].innerText;
+    campoLote3.value = linha.cells[4].innerText;
+    campoLote10.value = linha.cells[5].innerText;
+
+    campoCaixas.value = linha.cells[6].innerText;
+    campoObservacoes.value = linha.cells[7].innerText;
+    paleteAtual = linha.cells[2].innerText;
+    usarInsercaoManual();
+}
+
+function excluirLinha(botao) {
+    botao.parentNode.parentNode.remove();
+    salvarLocalStorage();
+    atualizarResumoPaleteAtual();
+    indiceEditando = null;
+}
+
+function reiniciarEntradas() {
+    if (!confirm("Tem certeza que deseja apagar todas as entradas?")) return;
+
+    localStorage.removeItem("entradas");
+
+    let tbody = document.querySelector("#tabela tbody");
+    tbody.innerHTML = "";
+    paleteAtual = null;
+    if (!document.getElementById("formEntrada").classList.contains("hidden")) garantirPaleteAtual();
+
+    alert("Entradas apagadas com sucesso.");
+}
+
+function ordenarTabela(coluna) {
+    let tbody = document.querySelector("#tabela tbody");
+    let linhas = Array.from(tbody.rows);
+
+    linhas.sort((a, b) => {
+        let A = a.cells[coluna].innerText;
+        let B = b.cells[coluna].innerText;
+
+        if (coluna === 0) {
+            let [dA, mA, aA] = A.split("/");
+            let [dB, mB, aB] = B.split("/");
+            return ordemAsc
+                ? new Date(aA, mA - 1, dA) - new Date(aB, mB - 1, dB)
+                : new Date(aB, mB - 1, dB) - new Date(aA, mA - 1, dA);
+        }
+
+        return ordemAsc ? A.localeCompare(B) : B.localeCompare(A);
+    });
+
+    ordemAsc = !ordemAsc;
+    linhas.forEach(l => tbody.appendChild(l));
+}
+
+function formatarDataBR(dataISO) {
+    const partes = dataISO.split("-");
+    return `${partes[2]}/${partes[1]}/${partes[0]}`;
+}
+
+async function gerarExcel() {
+    const tabela = document.getElementById("tabela");
+
+    const linhas = tabela.querySelectorAll("tbody tr");
+    if (linhas.length === 0) {
+        alert("Não há entradas salvas para gerar o Excel.");
+        return;
+    }
+
+    function dataBRParaExcel(dataBR) {
+        if (!dataBR) return null;
+
+        const partes = String(dataBR).trim().split("/");
+        if (partes.length !== 3) return null;
+
+        const [dia, mes, ano] = partes.map((parte) => Number(parte));
+        if (!Number.isInteger(dia) || !Number.isInteger(mes) || !Number.isInteger(ano)) {
+            return null;
+        }
+
+        // Grava a data como número serial do Excel, sem criar objeto Date UTC.
+        // Isso evita o problema de aparecer 1 dia antes em celulares/computadores.
+        const dataLocal = new Date(ano, mes - 1, dia);
+        if (Number.isNaN(dataLocal.getTime())) return null;
+
+        const excelEpoch = new Date(1899, 11, 30);
+        return Math.round((dataLocal - excelEpoch) / (1000 * 60 * 60 * 24));
+    }
+
+    // Exporta somente os dados; a coluna AÇÃO existe apenas na tela.
+    const cabecalho = Array.from(tabela.querySelectorAll("thead th"))
+        .slice(0, -1)
+        .map((th) => th.innerText.trim());
+    const dados = Array.from(linhas).map((linha) =>
+        Array.from(linha.cells)
+            .slice(0, -1)
+            .map((celula) => celula.innerText.trim())
+    );
+
+    const ws_data = [cabecalho, ...dados.map((linha) =>
+        linha.map((valor, indiceColuna) => {
+            if (indiceColuna === 0) {
+                const numeroExcel = dataBRParaExcel(valor);
+                return numeroExcel !== null ? numeroExcel : valor;
+            }
+            return valor;
+        })
+    )];
+
+    const ws = XLSX.utils.aoa_to_sheet(ws_data);
+    ws["!cols"] = [{ wch: 14 }, { wch: 14 }, { wch: 14 }, { wch: 18 }, { wch: 12 }, { wch: 12 }, { wch: 8 }, { wch: 36 }];
+
+    const range = XLSX.utils.decode_range(ws["!ref"]);
+    for (let row = 1; row <= range.e.r; row++) {
+        const cellRef = XLSX.utils.encode_cell({ r: row, c: 0 });
+        if (ws[cellRef] && typeof ws[cellRef].v === "number") {
+            ws[cellRef].t = "n";
+            ws[cellRef].z = "dd/mm/yyyy";
+        }
+    }
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Romaneio");
+
+    const excelBin = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+
+    const arquivo = new Blob([excelBin], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    });
+
+    const url = URL.createObjectURL(arquivo);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "romaneio.xlsx";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    alert("Arquivo Excel gerado e salvo com sucesso.");
+}
+
+let swRegistration = null;
+let pendingServiceWorker = null;
+
+function showUpdateBanner(worker) {
+    pendingServiceWorker = worker || pendingServiceWorker;
+    const banner = document.getElementById("updateBanner");
+    if (banner) banner.classList.add("show");
+}
+
+function hideUpdateBanner() {
+    const banner = document.getElementById("updateBanner");
+    if (banner) banner.classList.remove("show");
+}
+
+function aplicarAtualizacao() {
+    if (pendingServiceWorker) {
+        pendingServiceWorker.postMessage({ type: "SKIP_WAITING" });
+        return;
+    }
+    window.location.reload();
+}
+
+async function verificarVersaoPublicada() {
+    try {
+        const resp = await fetch(VERSION_URL + "?t=" + Date.now(), { cache: "no-store" });
+        if (!resp.ok) return;
+        const dados = await resp.json();
+        const versaoPublicada = dados.version;
+        const ultimaVista = localStorage.getItem("romaneio_version_seen");
+        if (!ultimaVista) localStorage.setItem("romaneio_version_seen", APP_VERSION);
+        if (versaoPublicada && versaoPublicada !== APP_VERSION) {
+            showUpdateBanner(null);
+        }
+    } catch (e) {
+        console.warn("Não foi possível verificar atualizações.", e);
+    }
+}
+
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("service-worker.js").then(reg => {
+        swRegistration = reg;
+        if (reg.waiting) showUpdateBanner(reg.waiting);
+        reg.addEventListener("updatefound", () => {
+            const novoWorker = reg.installing;
+            if (!novoWorker) return;
+            novoWorker.addEventListener("statechange", () => {
+                if (novoWorker.state === "installed" && navigator.serviceWorker.controller) {
+                    showUpdateBanner(novoWorker);
+                }
+            });
+        });
+        setInterval(() => reg.update(), 60 * 60 * 1000);
+    });
+
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+        window.location.reload();
+    });
+}
+
+window.addEventListener("online", () => {
+    if (swRegistration) swRegistration.update();
+    verificarVersaoPublicada();
+});
+
+window.addEventListener("load", verificarVersaoPublicada);
+
+document.addEventListener("click", (ev) => {
+    if (ev.target && ev.target.id === "updateNowBtn") aplicarAtualizacao();
+});
+
+let deferredInstallPrompt = null;
+window.addEventListener("beforeinstallprompt", (event) => {
+    event.preventDefault();
+    deferredInstallPrompt = event;
+    if (!window.matchMedia("(display-mode: standalone)").matches) {
+        const banner = document.getElementById("installBanner");
+        if (banner) setTimeout(() => banner.classList.add("show"), 800);
+    }
+});
+
+document.addEventListener("click", async (ev) => {
+    if (ev.target && ev.target.id === "installCloseBtn") {
+        const banner = document.getElementById("installBanner");
+        if (banner) banner.classList.remove("show");
+    }
+    if (ev.target && ev.target.id === "installNowBtn") {
+        if (!deferredInstallPrompt) return;
+        deferredInstallPrompt.prompt();
+        await deferredInstallPrompt.userChoice;
+        deferredInstallPrompt = null;
+        const banner = document.getElementById("installBanner");
+        if (banner) banner.classList.remove("show");
+    }
+});
+
+
+function atualizarDashboardVisual() {
+    const linhas = Array.from(document.querySelectorAll("#tabela tbody tr"));
+    const totalRegistros = linhas.length;
+    const totalCaixas = linhas.reduce((s, linha) => s + Number(linha.cells[6]?.innerText || 0), 0);
+    const totalPaletes = new Set(linhas.map(linha => linha.cells[2]?.innerText).filter(Boolean)).size;
+    const ultimo = totalRegistros ? linhas[totalRegistros - 1].cells[0].innerText : "--";
+
+    const elReg = document.getElementById("dashRegistros");
+    const elCx = document.getElementById("dashCaixas");
+    const elPal = document.getElementById("dashPaletes");
+    const elUlt = document.getElementById("dashUltimo");
+
+    if (elReg) elReg.innerText = totalRegistros;
+    if (elCx) elCx.innerText = totalCaixas;
+    if (elPal) elPal.innerText = totalPaletes;
+    if (elUlt) elUlt.innerText = ultimo === "--" ? "--" : ultimo.substring(0, 5);
+
+    const emptyState = document.getElementById("emptyState");
+    const tableContainer = document.getElementById("tableContainer");
+    if (emptyState) emptyState.style.display = totalRegistros ? "none" : "flex";
+    if (tableContainer) tableContainer.classList.toggle("is-empty", totalRegistros === 0);
+}
+
+function iniciarInterfaceVisual() {
+    atualizarDashboardVisual();
+    const tbody = document.querySelector("#tabela tbody");
+    if (tbody) {
+        const observer = new MutationObserver(atualizarDashboardVisual);
+        observer.observe(tbody, { childList: true, subtree: true, characterData: true });
+    }
+}
+</script>
+</body>
+</html>
