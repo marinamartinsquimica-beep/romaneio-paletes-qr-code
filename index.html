@@ -42,7 +42,7 @@
 <div class="input-group full qr-operational-field"><label>Observações</label><input type="text" id="campoObservacoes" maxlength="250"></div>
 </div><div class="actions"><div id="acoesComposicao" class="actions"><button id="btnAdicionarMais" class="btn-blue" type="button" onclick="salvarComposicao(false)">ADICIONAR MAIS AO PALETE</button><button id="btnFinalizarPalete" class="btn-primary" type="button" onclick="salvarComposicao(true)">FINALIZAR PALETE</button></div><button id="btnLerQrAtual" class="btn-secondary" type="button" onclick="abrirLeitorQr()">Ler QR neste palete</button><button class="btn-secondary" type="button" onclick="voltarEscolhaFluxo()">Voltar</button><button id="btnExcel" onclick="gerarExcel()">Gerar Excel e Salvar</button><button id="btnReiniciar" class="btn-danger" onclick="reiniciarEntradas()">Reiniciar Entradas</button></div></section>
 <section class="card"><div class="card-header"><h2>Entradas</h2><span class="badge">Lista</span></div><div class="table-container" id="tableContainer"><table id="tabela"><thead><tr><th onclick="ordenarTabela(0)">DATA</th><th onclick="ordenarTabela(1)">SKU</th><th onclick="ordenarTabela(2)">PALETE</th><th onclick="ordenarTabela(3)">LOTE COMPLETO</th><th>LOTE</th><th>POST</th><th>CX</th><th>OBSERVAÇÕES</th><th>AÇÃO</th></tr></thead><tbody></tbody></table><div class="empty-state" id="emptyState"><div class="empty-icon">📋</div><strong>Nenhuma entrada encontrada</strong><span>Preencha o formulário para adicionar o primeiro romaneio.</span></div></div></section>
-</main><footer class="footer">🛡️ <strong>Romaneio Paletes</strong> &nbsp;•&nbsp; Dados salvos localmente no aparelho<div class="app-version">Versão <span id="appVersion">1.4.3</span></div></footer></div><button class="fab" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+</main><footer class="footer">🛡️ <strong>Romaneio Paletes</strong> &nbsp;•&nbsp; Dados salvos localmente no aparelho<div class="app-version">Versão <span id="appVersion">1.4.4</span></div></footer></div><button class="fab" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
 <div id="updateBanner" class="update-banner" aria-live="polite">
   <div><strong>🚀 Nova versão disponível</strong><span>Toque para atualizar o app.</span></div>
@@ -58,7 +58,7 @@
 </div>
 
 <script>
-const APP_VERSION = "1.4.3";
+const APP_VERSION = "1.4.4";
 const VERSION_URL = "version.json";
 const ESTADO_OPERACIONAL_KEY = "romaneio_estado_operacional";
 const RASCUNHO_KEY = "romaneio_rascunho";
@@ -70,6 +70,7 @@ let decodificandoQr = false;
 let ultimoFrameQr = 0;
 let detectorQr = null;
 let paleteAtual = null;
+let adicionandoEmPaleteFechado = false;
 
 function dataLocalISO() {
     const agora = new Date();
@@ -97,11 +98,13 @@ function lerEstadoOperacional() {
 function persistirPaleteAberto(numero) {
     paleteAtual = String(numero);
     localStorage.setItem(ESTADO_OPERACIONAL_KEY, JSON.stringify({ paleteAtual, paleteAberto: true }));
+    atualizarAcoesAdicionarEntrada();
 }
 
 function finalizarEstadoPalete() {
     localStorage.setItem(ESTADO_OPERACIONAL_KEY, JSON.stringify({ paleteAtual: null, paleteAberto: false }));
     paleteAtual = null;
+    atualizarAcoesAdicionarEntrada();
 }
 
 function lerRascunho() {
@@ -110,7 +113,7 @@ function lerRascunho() {
 }
 
 function salvarRascunhoAtual() {
-    if (indiceEditando !== null || paleteAtual === null) return;
+    if (indiceEditando !== null || adicionandoEmPaleteFechado || paleteAtual === null) return;
     const rascunho = {
         data: campoData.value,
         sku: campoSku.value,
@@ -218,7 +221,7 @@ function garantirPaleteAtual() {
         const estado = lerEstadoOperacional();
         paleteAtual = estado ? estado.paleteAtual : String(proximoNumeroPalete());
     }
-    if (indiceEditando === null) persistirPaleteAberto(paleteAtual);
+    if (indiceEditando === null && !adicionandoEmPaleteFechado) persistirPaleteAberto(paleteAtual);
     campoPalete.value = String(paleteAtual);
     atualizarResumoPaleteAtual();
     return paleteAtual;
@@ -413,6 +416,9 @@ function exibirPaginaInicial() {
     limparCampos();
     fluxoEntrada = null;
     paleteAtual = null;
+    adicionandoEmPaleteFechado = false;
+    document.querySelector("#escolhaFluxo h2").textContent = "Adicionar palete";
+    document.querySelector("#escolhaFluxo .badge").textContent = "Nova entrada";
     document.getElementById("formEntrada").classList.add("hidden");
     document.getElementById("formEntrada").classList.remove("qr-mode", "qr-scanning");
     document.getElementById("escolhaFluxo").classList.remove("hidden");
@@ -496,6 +502,12 @@ function preencherLinha(linha, item) {
     });
 
     const acoes = linha.insertCell();
+    const adicionar = document.createElement("button");
+    adicionar.className = "btn-primary btn-adicionar-entrada";
+    adicionar.type = "button";
+    adicionar.textContent = "Adicionar entrada";
+    adicionar.addEventListener("click", () => adicionarEntradaPaleteFechado(adicionar));
+
     const editar = document.createElement("button");
     editar.className = "btn-blue";
     editar.type = "button";
@@ -507,7 +519,27 @@ function preencherLinha(linha, item) {
     excluir.type = "button";
     excluir.textContent = "Excluir";
     excluir.addEventListener("click", () => excluirLinha(excluir));
-    acoes.append(editar, excluir);
+    acoes.append(adicionar, editar, excluir);
+}
+
+function atualizarAcoesAdicionarEntrada() {
+    const estado = lerEstadoOperacional();
+    document.querySelectorAll(".btn-adicionar-entrada").forEach(botao => {
+        const numero = botao.closest("tr")?.cells[2]?.textContent || "";
+        botao.classList.toggle("hidden", Boolean(estado && String(estado.paleteAtual) === String(numero)));
+    });
+}
+
+function adicionarEntradaPaleteFechado(botao) {
+    const linha = botao.closest("tr");
+    if (!linha) return;
+    paleteAtual = linha.cells[2].textContent;
+    adicionandoEmPaleteFechado = true;
+    document.querySelector("#escolhaFluxo h2").textContent = `Adicionar entrada ao palete ${paleteAtual}`;
+    document.querySelector("#escolhaFluxo .badge").textContent = "Palete fechado";
+    document.getElementById("formEntrada").classList.add("hidden");
+    document.getElementById("escolhaFluxo").classList.remove("hidden");
+    window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function salvarLocalStorage() {
@@ -540,6 +572,7 @@ function carregarLocalStorage() {
         let linha = tbody.insertRow();
         preencherLinha(linha, item);
     });
+    atualizarAcoesAdicionarEntrada();
 }
 
 window.onload = function() {
@@ -610,10 +643,16 @@ function salvarEntrada() {
 
 function salvarComposicao(finalizarPalete) {
     const editando = indiceEditando !== null;
+    const inclusaoEmPaleteFechado = adicionandoEmPaleteFechado;
     if (!salvarEntrada()) return false;
 
     if (editando) {
         paleteAtual = null;
+        exibirPaginaInicial();
+        return true;
+    }
+
+    if (inclusaoEmPaleteFechado) {
         exibirPaginaInicial();
         return true;
     }
