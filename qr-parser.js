@@ -17,29 +17,41 @@
 
     function parseQrPalete(texto) {
         if (typeof texto !== "string" || !texto.trim()) {
-            throw new Error("QR vazio.");
+            throw new Error("Código vazio.");
         }
 
+        const valorLido = texto.trim();
         const campos = {};
-        const partes = texto.split(";");
 
-        for (const parte of partes) {
-            const separador = parte.indexOf("=");
-            if (separador <= 0) throw new Error("Formato de QR inválido.");
-
-            const chave = parte.slice(0, separador).trim().toUpperCase();
-            const valor = parte.slice(separador + 1).trim();
-
-            if (!chave || !valor || campos[chave] !== undefined) {
-                throw new Error("Formato de QR inválido.");
+        if (valorLido.toUpperCase().startsWith("DM1|")) {
+            const partes = valorLido.split("|").map((parte) => parte.trim());
+            if (partes.length !== 4 || partes[0].toUpperCase() !== "DM1" ||
+                partes.slice(1).some((parte) => !parte)) {
+                throw new Error("Formato de Data Matrix inválido.");
             }
-            campos[chave] = valor;
+
+            [, campos.SKU, campos.LOTE, campos.POSTURA] = partes;
+        } else {
+            const partes = valorLido.split(";");
+
+            for (const parte of partes) {
+                const separador = parte.indexOf("=");
+                if (separador <= 0) throw new Error("Formato de QR inválido.");
+
+                const chave = parte.slice(0, separador).trim().toUpperCase();
+                const valor = parte.slice(separador + 1).trim();
+
+                if (!chave || !valor || campos[chave] !== undefined) {
+                    throw new Error("Formato de QR inválido.");
+                }
+                campos[chave] = valor;
+            }
         }
 
         const chavesPermitidas = ["SKU", "LOTE", "POSTURA"];
         if (Object.keys(campos).some((chave) => !chavesPermitidas.includes(chave)) ||
             chavesPermitidas.some((chave) => !campos[chave])) {
-            throw new Error("O QR deve conter SKU, LOTE e POSTURA.");
+            throw new Error("O código deve conter SKU, LOTE e POSTURA.");
         }
 
         if (!/^[A-Za-z0-9._\/-]{1,50}$/.test(campos.SKU)) {

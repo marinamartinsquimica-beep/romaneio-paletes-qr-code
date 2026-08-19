@@ -9,6 +9,7 @@
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="vendor/zxing.min.js"></script>
 <script src="jsQR.js"></script>
 <script src="export-utils.js"></script>
 <script src="qr-parser.js"></script>
@@ -26,10 +27,10 @@
 <header class="topbar"><div class="brand"><img src="icon-512.png" class="brand-icon" alt="Logo"><div><h1>Romaneio Paletes</h1><p>Sistema local para controle de paletes</p></div></div><div class="status-pill">💾 Dados salvos no aparelho</div></header>
 <section class="dashboard"><div class="metric"><div class="ico">📋</div><div><b id="dashRegistros">0</b><span>Registros</span></div></div><div class="metric"><div class="ico">📦</div><div><b id="dashCaixas">0</b><span>Caixas</span></div></div><div class="metric"><div class="ico">🧱</div><div><b id="dashPaletes">0</b><span>Paletes</span></div></div><div class="metric"><div class="ico">🕒</div><div><b id="dashUltimo">--</b><span>Último registro</span></div></div></section>
 <main class="layout">
-<section class="card flow-card" id="escolhaFluxo"><div class="card-header"><h2>Adicionar palete</h2><span class="badge">Nova entrada</span></div><p>Leia a etiqueta do palete ou utilize o preenchimento manual.</p><div class="flow-actions"><button class="btn-primary" type="button" onclick="abrirLeitorQr()">📷 LER QR CODE</button><button class="btn-secondary" type="button" onclick="usarInsercaoManual()">INSERÇÃO MANUAL</button><button id="btnExcelInicial" type="button" onclick="gerarExcel()">GERAR E SALVAR EXCEL</button><button id="btnReiniciarInicial" class="btn-danger" type="button" onclick="reiniciarEntradas()">REINICIAR ENTRADAS</button></div></section>
+<section class="card flow-card" id="escolhaFluxo"><div class="card-header"><h2>Adicionar palete</h2><span class="badge">Nova entrada</span></div><p>Leia a etiqueta do palete ou utilize o preenchimento manual.</p><div class="flow-actions"><button class="btn-primary" type="button" onclick="abrirLeitorQr()">📷 LER CÓDIGO</button><button class="btn-secondary" type="button" onclick="usarInsercaoManual()">INSERÇÃO MANUAL</button><button id="btnExcelInicial" type="button" onclick="gerarExcel()">GERAR E SALVAR EXCEL</button><button id="btnReiniciarInicial" class="btn-danger" type="button" onclick="reiniciarEntradas()">REINICIAR ENTRADAS</button></div></section>
 <section class="card form-card hidden" id="formEntrada"><div class="card-header"><h2 id="tituloEntrada">Romaneio Paletes</h2><span class="badge" id="badgeEntrada">Entrada</span></div>
 <div class="palete-andamento" id="paleteAndamento"><span>PALETE <b id="numeroPaleteAtual">1</b></span><span>Itens: <b id="itensPaleteAtual">0</b></span><span>Total de caixas: <b id="caixasPaleteAtual">0</b></span></div>
-<div class="qr-panel hidden" id="qrPanel"><video id="qrVideo" class="qr-video" playsinline muted></video><canvas id="qrCanvas" class="hidden"></canvas><p class="qr-status" id="qrStatus" aria-live="polite">Aponte a câmera para o QR Code.</p><div class="camera-actions"><button class="btn-secondary" type="button" onclick="cancelarLeitorQr()">Cancelar leitura</button><button class="btn-blue" type="button" onclick="usarInsercaoManual()">Usar inserção manual</button></div></div>
+<div class="qr-panel hidden" id="qrPanel"><video id="qrVideo" class="qr-video" playsinline muted></video><canvas id="qrCanvas" class="hidden"></canvas><p class="qr-status" id="qrStatus" aria-live="polite">Aponte a câmera para o Data Matrix ou QR Code.</p><div class="camera-actions"><button class="btn-secondary" type="button" onclick="cancelarLeitorQr()">Cancelar leitura</button><button class="btn-blue" type="button" onclick="usarInsercaoManual()">Usar inserção manual</button></div></div>
 <div class="qr-summary hidden" id="qrResumo"><div><strong>SKU</strong><span id="qrResumoSku"></span></div><div><strong>Lote</strong><span id="qrResumoLote"></span></div><div><strong>Data de Postura</strong><span id="qrResumoPostura"></span></div><div><strong>Lote Completo</strong><span id="qrResumoCompleto"></span></div></div>
 <div class="form-grid">
 <div class="input-group manual-field"><label>Data</label><input type="date" id="campoData"></div>
@@ -40,9 +41,9 @@
 <div class="input-group full manual-field"><label>Lote Completo</label><input type="text" id="campoLote" disabled></div>
 <div class="input-group full qr-operational-field"><label>Quantidade de Caixas</label><input type="number" id="campoCaixas" min="1"></div>
 <div class="input-group full qr-operational-field"><label>Observações</label><input type="text" id="campoObservacoes" maxlength="250"></div>
-</div><div class="actions"><div id="acoesComposicao" class="actions"><button id="btnAdicionarMais" class="btn-blue" type="button" onclick="salvarComposicao(false)">ADICIONAR MAIS AO PALETE</button><button id="btnFinalizarPalete" class="btn-primary" type="button" onclick="salvarComposicao(true)">FINALIZAR PALETE</button></div><button id="btnLerQrAtual" class="btn-secondary" type="button" onclick="abrirLeitorQr()">Ler QR neste palete</button><button class="btn-secondary" type="button" onclick="voltarEscolhaFluxo()">Voltar</button><button id="btnExcel" onclick="gerarExcel()">Gerar Excel e Salvar</button><button id="btnReiniciar" class="btn-danger" onclick="reiniciarEntradas()">Reiniciar Entradas</button></div></section>
+</div><div class="actions"><div id="acoesComposicao" class="actions"><button id="btnAdicionarMais" class="btn-blue" type="button" onclick="salvarComposicao(false)">ADICIONAR MAIS AO PALETE</button><button id="btnFinalizarPalete" class="btn-primary" type="button" onclick="salvarComposicao(true)">FINALIZAR PALETE</button></div><button id="btnLerQrAtual" class="btn-secondary" type="button" onclick="abrirLeitorQr()">Ler código neste palete</button><button class="btn-secondary" type="button" onclick="voltarEscolhaFluxo()">Voltar</button><button id="btnExcel" onclick="gerarExcel()">Gerar Excel e Salvar</button><button id="btnReiniciar" class="btn-danger" onclick="reiniciarEntradas()">Reiniciar Entradas</button></div></section>
 <section class="card"><div class="card-header"><h2>Entradas</h2><span class="badge">Lista</span></div><div class="table-container" id="tableContainer"><table id="tabela"><thead><tr><th onclick="ordenarTabela(0)">DATA</th><th onclick="ordenarTabela(1)">SKU</th><th onclick="ordenarTabela(2)">PALETE</th><th onclick="ordenarTabela(3)">LOTE COMPLETO</th><th>LOTE</th><th>POST</th><th>CX</th><th>OBSERVAÇÕES</th><th>AÇÃO</th></tr></thead><tbody></tbody></table><div class="empty-state" id="emptyState"><div class="empty-icon">📋</div><strong>Nenhuma entrada encontrada</strong><span>Preencha o formulário para adicionar o primeiro romaneio.</span></div></div></section>
-</main><footer class="footer">🛡️ <strong>Romaneio Paletes</strong> &nbsp;•&nbsp; Dados salvos localmente no aparelho<div class="app-version">Versão <span id="appVersion">1.4.4</span></div></footer></div><button class="fab" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+</main><footer class="footer">🛡️ <strong>Romaneio Paletes</strong> &nbsp;•&nbsp; Dados salvos localmente no aparelho<div class="app-version">Versão <span id="appVersion">1.5.0</span></div></footer></div><button class="fab" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
 <div id="updateBanner" class="update-banner" aria-live="polite">
   <div><strong>🚀 Nova versão disponível</strong><span>Toque para atualizar o app.</span></div>
@@ -58,7 +59,7 @@
 </div>
 
 <script>
-const APP_VERSION = "1.4.4";
+const APP_VERSION = "1.5.0";
 const VERSION_URL = "version.json";
 const ESTADO_OPERACIONAL_KEY = "romaneio_estado_operacional";
 const RASCUNHO_KEY = "romaneio_rascunho";
@@ -69,6 +70,7 @@ let leituraTravada = false;
 let decodificandoQr = false;
 let ultimoFrameQr = 0;
 let detectorQr = null;
+let leitorDataMatrix = null;
 let paleteAtual = null;
 let adicionandoEmPaleteFechado = false;
 
@@ -150,8 +152,8 @@ function restaurarRascunho(rascunho) {
         const formulario = document.getElementById("formEntrada");
         formulario.classList.add("qr-mode");
         formulario.classList.remove("qr-scanning");
-        document.getElementById("tituloEntrada").textContent = "Leitura de QR Code";
-        document.getElementById("badgeEntrada").textContent = "QR recuperado";
+        document.getElementById("tituloEntrada").textContent = "Leitura de código";
+        document.getElementById("badgeEntrada").textContent = "Código recuperado";
         document.getElementById("qrResumoSku").textContent = campoSku.value;
         document.getElementById("qrResumoLote").textContent = campoLote3.value;
         document.getElementById("qrResumoPostura").textContent = campoLote10.value;
@@ -266,6 +268,44 @@ function mostrarFalhaQr(mensagem) {
     if (status) status.textContent = `${mensagem} Use a inserção manual para continuar.`;
 }
 
+async function criarDetectorNativo() {
+    if (!("BarcodeDetector" in window)) return null;
+
+    let formatos = ["data_matrix", "qr_code"];
+    if (typeof BarcodeDetector.getSupportedFormats === "function") {
+        try {
+            const suportados = await BarcodeDetector.getSupportedFormats();
+            formatos = formatos.filter((formato) => suportados.includes(formato));
+        } catch (_) {
+            // Tenta os dois formatos diretamente em navegadores sem consulta confiável.
+        }
+    }
+
+    if (!formatos.length) return null;
+
+    try {
+        return new BarcodeDetector({ formats: formatos });
+    } catch (_) {
+        try {
+            return new BarcodeDetector({ formats: ["qr_code"] });
+        } catch (_) {
+            return null;
+        }
+    }
+}
+
+function criarLeitorDataMatrix() {
+    if (!window.ZXing || typeof window.ZXing.MultiFormatReader !== "function") return null;
+
+    const dicas = new Map();
+    dicas.set(window.ZXing.DecodeHintType.POSSIBLE_FORMATS, [window.ZXing.BarcodeFormat.DATA_MATRIX]);
+    dicas.set(window.ZXing.DecodeHintType.TRY_HARDER, true);
+
+    const leitor = new window.ZXing.MultiFormatReader();
+    leitor.setHints(dicas);
+    return leitor;
+}
+
 async function abrirLeitorQr() {
     pararCamera();
     limparCampos();
@@ -281,8 +321,8 @@ async function abrirLeitorQr() {
     formulario.classList.add("qr-mode", "qr-scanning");
     document.getElementById("qrPanel").classList.remove("hidden");
     document.getElementById("qrResumo").classList.add("hidden");
-    document.getElementById("tituloEntrada").textContent = "Leitura de QR Code";
-    document.getElementById("badgeEntrada").textContent = "QR";
+    document.getElementById("tituloEntrada").textContent = "Leitura de código";
+    document.getElementById("badgeEntrada").textContent = "Código";
     document.getElementById("qrStatus").textContent = "Solicitando acesso à câmera...";
     campoData.value = dataLocalISO();
 
@@ -291,8 +331,10 @@ async function abrirLeitorQr() {
         return;
     }
 
-    if (!("BarcodeDetector" in window) && typeof window.jsQR !== "function") {
-        mostrarFalhaQr("Leitor de QR indisponível.");
+    if (!("BarcodeDetector" in window) &&
+        typeof window.jsQR !== "function" &&
+        (!window.ZXing || typeof window.ZXing.MultiFormatReader !== "function")) {
+        mostrarFalhaQr("Leitor de código indisponível.");
         return;
     }
 
@@ -306,15 +348,10 @@ async function abrirLeitorQr() {
         video.srcObject = cameraStream;
         await video.play();
 
-        if ("BarcodeDetector" in window) {
-            try {
-                detectorQr = new BarcodeDetector({ formats: ["qr_code"] });
-            } catch (_) {
-                detectorQr = null;
-            }
-        }
+        detectorQr = await criarDetectorNativo();
+        leitorDataMatrix = criarLeitorDataMatrix();
 
-        document.getElementById("qrStatus").textContent = "Aponte a câmera para o QR Code.";
+        document.getElementById("qrStatus").textContent = "Aponte a câmera para o Data Matrix ou QR Code.";
         scanFrameId = requestAnimationFrame(processarQuadroQr);
     } catch (_) {
         pararCamera();
@@ -344,15 +381,44 @@ async function processarQuadroQr(timestamp) {
             }
         }
 
-        if (!texto && typeof window.jsQR === "function") {
+        if (!texto && (leitorDataMatrix || typeof window.jsQR === "function")) {
             const canvas = document.getElementById("qrCanvas");
             const contexto = canvas.getContext("2d", { willReadFrequently: true });
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             contexto.drawImage(video, 0, 0, canvas.width, canvas.height);
             const pixels = contexto.getImageData(0, 0, canvas.width, canvas.height);
-            const resultado = window.jsQR(pixels.data, pixels.width, pixels.height, { inversionAttempts: "dontInvert" });
-            texto = resultado?.data || "";
+
+            if (leitorDataMatrix) {
+                try {
+                    const fonte = new window.ZXing.RGBLuminanceSource(
+                        new Int32Array(
+                            pixels.data.buffer,
+                            pixels.data.byteOffset,
+                            pixels.width * pixels.height
+                        ),
+                        pixels.width,
+                        pixels.height
+                    );
+                    const bitmap = new window.ZXing.BinaryBitmap(
+                        new window.ZXing.HybridBinarizer(fonte)
+                    );
+                    const resultadoDataMatrix = leitorDataMatrix.decode(bitmap);
+                    texto = resultadoDataMatrix?.getText?.() || resultadoDataMatrix?.text || "";
+                } catch (_) {
+                    leitorDataMatrix.reset();
+                }
+            }
+
+            if (!texto && typeof window.jsQR === "function") {
+                const resultadoQr = window.jsQR(
+                    pixels.data,
+                    pixels.width,
+                    pixels.height,
+                    { inversionAttempts: "dontInvert" }
+                );
+                texto = resultadoQr?.data || "";
+            }
         }
 
         if (texto) preencherFormularioComQr(texto);
@@ -369,7 +435,7 @@ function preencherFormularioComQr(texto) {
         dados = window.qrPaleteParser.parse(texto);
     } catch (erro) {
         const status = document.getElementById("qrStatus");
-        status.textContent = `${erro.message} Aponte para um QR válido.`;
+        status.textContent = `${erro.message} Aponte para um Data Matrix ou QR válido.`;
         return;
     }
 

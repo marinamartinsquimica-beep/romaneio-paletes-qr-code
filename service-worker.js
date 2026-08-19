@@ -1,4 +1,4 @@
-const CACHE_NAME = "romaneio-cache-v144-entrada-palete-fechado";
+const CACHE_NAME = "romaneio-cache-v150-data-matrix";
 
 const FILES_TO_CACHE = [
   "./",
@@ -6,6 +6,8 @@ const FILES_TO_CACHE = [
   "./index.html",
   "./export-utils.js",
   "./jsQR.js",
+  "./vendor/zxing.min.js",
+  "./vendor/LICENSE-zxing.txt",
   "./qr-parser.js",
   "./manifest.json",
   "./version.json",
