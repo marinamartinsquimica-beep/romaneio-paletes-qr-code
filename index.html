@@ -43,7 +43,7 @@
 <div class="input-group full qr-operational-field"><label>Observações</label><input type="text" id="campoObservacoes" maxlength="250"></div>
 </div><div class="actions"><div id="acoesComposicao" class="actions"><button id="btnAdicionarMais" class="btn-blue" type="button" onclick="salvarComposicao(false)">ADICIONAR MAIS AO PALETE</button><button id="btnFinalizarPalete" class="btn-primary" type="button" onclick="salvarComposicao(true)">FINALIZAR PALETE</button></div><button id="btnLerQrAtual" class="btn-secondary" type="button" onclick="abrirLeitorQr()">Ler código neste palete</button><button class="btn-secondary" type="button" onclick="voltarEscolhaFluxo()">Voltar</button><button id="btnExcel" onclick="gerarExcel()">Gerar Excel e Salvar</button><button id="btnReiniciar" class="btn-danger" onclick="reiniciarEntradas()">Reiniciar Entradas</button></div></section>
 <section class="card"><div class="card-header"><h2>Entradas</h2><span class="badge">Lista</span></div><div class="table-container" id="tableContainer"><table id="tabela"><thead><tr><th onclick="ordenarTabela(0)">DATA</th><th onclick="ordenarTabela(1)">SKU</th><th onclick="ordenarTabela(2)">PALETE</th><th onclick="ordenarTabela(3)">LOTE COMPLETO</th><th>LOTE</th><th>POST</th><th>CX</th><th>OBSERVAÇÕES</th><th>AÇÃO</th></tr></thead><tbody></tbody></table><div class="empty-state" id="emptyState"><div class="empty-icon">📋</div><strong>Nenhuma entrada encontrada</strong><span>Preencha o formulário para adicionar o primeiro romaneio.</span></div></div></section>
-</main><footer class="footer">🛡️ <strong>Romaneio Paletes</strong> &nbsp;•&nbsp; Dados salvos localmente no aparelho<div class="app-version">Versão <span id="appVersion">1.5.0</span></div></footer></div><button class="fab" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+</main><footer class="footer">🛡️ <strong>Romaneio Paletes</strong> &nbsp;•&nbsp; Dados salvos localmente no aparelho<div class="app-version">Versão <span id="appVersion">1.5.1</span></div></footer></div><button class="fab" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
 <div id="updateBanner" class="update-banner" aria-live="polite">
   <div><strong>🚀 Nova versão disponível</strong><span>Toque para atualizar o app.</span></div>
@@ -59,7 +59,7 @@
 </div>
 
 <script>
-const APP_VERSION = "1.5.0";
+const APP_VERSION = "1.5.1";
 const VERSION_URL = "version.json";
 const ESTADO_OPERACIONAL_KEY = "romaneio_estado_operacional";
 const RASCUNHO_KEY = "romaneio_rascunho";

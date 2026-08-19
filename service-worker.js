@@ -1,4 +1,4 @@
-const CACHE_NAME = "romaneio-cache-v150-data-matrix";
+const CACHE_NAME = "romaneio-cache-v151-data-matrix-retangular";
 
 const FILES_TO_CACHE = [
   "./",
